@@ -13,12 +13,13 @@ export default class BuildFunction extends Creep {
 
         // 默认优先级: spawn > storage > terminal > extension > tower > 其他
         const defaultPriority: StructureConstant[] = [
-            STRUCTURE_ROAD,
             STRUCTURE_SPAWN,
             STRUCTURE_STORAGE,
             STRUCTURE_TERMINAL,
             STRUCTURE_EXTENSION,
-            STRUCTURE_TOWER
+            STRUCTURE_LINK,
+            STRUCTURE_TOWER,
+            STRUCTURE_ROAD
         ];
         const priority = options?.priority || defaultPriority;
 

@@ -16,6 +16,9 @@ const ClaimModule = (flagName: string) => {
             room.SpawnMissionAdd('', '', -1, 'claimer',{targetRoom});
             log('CLAIM', `${room.name} 孵化了一个 claimer 来占领 ${targetRoom}`);
         }
+        // 派援建
+        const pos = Game.flags[flagName].pos;
+        pos.createFlag('AID-BUILD/' + room.name);
         Game.flags[flagName].remove();
         return true;
     }

@@ -1,10 +1,10 @@
 const outCarry = {
-    withdraw: function(creep: Creep) {
+    withdraw: function (creep: Creep) {
         if (creep.room.name != creep.memory.targetRoom || creep.pos.isRoomEdge()) {
             creep.moveToRoom(creep.memory.targetRoom, { plainCost: 2, swampCost: 10 });
             return;
         }
-        
+
         // 处理缓存的目标
         if (creep.memory.cache.targetId) {
             let target = Game.getObjectById(creep.memory.cache.targetId) as any;
@@ -27,7 +27,7 @@ const outCarry = {
                 creep.withdraw(target, resourceType);
             }
 
-            if ((targetType === 'dropped' && target.amount === 0) || 
+            if ((targetType === 'dropped' && target.amount === 0) ||
                 ((targetType === 'container' || targetType === 'ruin' || targetType === 'tombstone') && target.store.getUsedCapacity() === 0)) {
                 delete creep.memory.cache.targetId;
                 delete creep.memory.cache.targetType;
@@ -43,7 +43,7 @@ const outCarry = {
             const containers = creep.room.container?.filter((container: StructureContainer) =>
                 container && container.store.getUsedCapacity() >= 300 &&
                 container.pos.inRangeTo(creep.room.mineral, 2) &&
-                Object.values(Memory.creeps).every((m) => 
+                Object.values(Memory.creeps).every((m) =>
                     (m.role != 'out-carry' && m.role != 'out-car') || m.cache?.targetId !== container.id)
             );
             if (containers && containers.length > 0) {
@@ -58,7 +58,7 @@ const outCarry = {
         }
 
         // 使用 collectFromContainer 收集能量容器
-        if (creep.collectFromContainer(300, RESOURCE_ENERGY, false)) {
+        if (creep.collectFromContainer(creep.store.getFreeCapacity(), RESOURCE_ENERGY, false)) {
             return;
         }
 
@@ -66,7 +66,7 @@ const outCarry = {
         if (creep.collectDroppedResource(undefined, 500)) {
             return;
         }
-        
+
         // 使用 collectFromTombstone 收集墓碑资源
         if (creep.collectFromTombstone()) {
             return;
@@ -83,7 +83,7 @@ const outCarry = {
             filter: (c) => c.memory.role === 'out-mineral'
         });
         if (nearestMiner) {
-            if(!creep.pos.inRangeTo(nearestMiner, 1) || nearestMiner.store.getUsedCapacity() > 0) {
+            if (!creep.pos.inRangeTo(nearestMiner, 1) || nearestMiner.store.getUsedCapacity() > 0) {
                 creep.moveTo(nearestMiner, {
                     ignoreCreeps: false,
                     range: 1,
@@ -122,15 +122,15 @@ const outCarry = {
             })
         }
     },
-    
-    carry: function(creep: any) {
+
+    carry: function (creep: any) {
         if (creep.room.name != creep.memory.homeRoom || creep.pos.isRoomEdge()) {
             creep.moveToRoom(creep.memory.homeRoom, { plainCost: 2, swampCost: 10 });
             return;
         }
 
         let target: StructureContainer | StructureStorage;
-    
+
         if (creep.memory.cache.targetId) {
             target = Game.getObjectById(creep.memory.cache.targetId) as StructureContainer | StructureStorage;
             if (target) {
@@ -141,21 +141,21 @@ const outCarry = {
                         delete creep.memory.cache.targetId;
                     }
                 } else {
-                    creep.moveTo(target, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10  });
+                    creep.moveTo(target, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10 });
                 }
                 return;
             }
             delete creep.memory.cache.targetId;
         }
 
-        if(!target) {
+        if (!target) {
             if (creep.room.terminal &&
                 creep.room.terminal.store[RESOURCE_ENERGY] < 10000) {
                 target = creep.room.terminal;
             }
         }
 
-        if(!target) {
+        if (!target) {
             const targets = [];
             if (creep.room.terminal &&
                 creep.room.terminal.store.getFreeCapacity() > 50000) {
@@ -167,7 +167,7 @@ const outCarry = {
             }
             target = creep.pos.findClosestByRange(targets);
         }
-    
+
         if (target) {
             creep.memory.cache.targetId = target.id;
             if (creep.pos.inRangeTo(target, 1)) {
@@ -177,7 +177,7 @@ const outCarry = {
                     delete creep.memory.cache.targetId;
                 }
             } else {
-                creep.moveTo(target, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10  });
+                creep.moveTo(target, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10 });
             }
         } else {
             const storage = creep.room.storage;
@@ -186,48 +186,70 @@ const outCarry = {
                 if (creep.pos.inRangeTo(storage, 1)) {
                     creep.drop(Object.keys(creep.store)[0]);
                 } else {
-                    creep.moveTo(storage, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10  });
+                    creep.moveTo(storage, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10 });
                 }
             } else if (controller && controller.level < 8) {
                 if (creep.pos.inRangeTo(controller, 1)) {
                     creep.drop(Object.keys(creep.store)[0]);
                 } else {
-                    creep.moveTo(controller, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10  });
+                    creep.moveTo(controller, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10 });
                 }
-            } 
+            }
             else {
                 const center = Memory['RoomControlData'][creep.room.name]?.center;
                 const centerPos = new RoomPosition(center.x, center.y, creep.room.name);
                 if (centerPos && creep.pos.inRangeTo(centerPos, 1)) {
                     creep.drop(Object.keys(creep.store)[0]);
                 } else {
-                    creep.moveTo(centerPos, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10  });
+                    creep.moveTo(centerPos, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10 });
                 }
             }
         }
     },
 
-    buildRepair: function(creep: Creep) {
-        if(creep.room.name == creep.memory.homeRoom) return false;
-        if(creep.memory.role !== 'out-car') return false;
-        if(creep.store[RESOURCE_ENERGY] == 0) return false;
+    buildRepair: function (creep: Creep) {
+        if (creep.room.name == creep.memory.homeRoom) return false;
+        if (creep.memory.role !== 'out-car') return false;
+        if (creep.store[RESOURCE_ENERGY] == 0) return false;
+
+        // 同时修路和移动
+        const target = Game.getObjectById(creep.memory.cache.targetId) as StructureContainer | StructureStorage;
+        const road = creep.pos.lookFor(LOOK_STRUCTURES).find((s) => s.structureType === STRUCTURE_ROAD) as StructureRoad;
+        if (road) {
+            if (road.hits < road.hitsMax / 10 * 9) {
+                creep.repair(road)
+            }
+            if (road.hits > road.hitsMax / 10 * 8 && target && !creep.pos.inRangeTo(target, 1)) {
+                creep.moveTo(target);
+            }
+        }
+        else {
+            creep.moveTo(target)
+        }
 
         // 使用 repairRoad 方法维修道路
         // 只维修范围1内的道路
-        const roads = creep.room.road?.filter((r: any) => {
-            if (!r || r.hits >= r.hitsMax * 0.8) return false;
-            if (!creep.pos.inRangeTo(r.pos, 1)) return false;
-            return true;
-        });
-        if (roads && roads.length > 0) {
-            const road = creep.pos.findClosestByRange(roads);
-            const result = creep.repair(road);
-            if (creep.pos.isRoomEdge()) {
-                creep.moveToRoom(creep.room.name, { plainCost: 2, swampCost: 10 });
-            }
-            if(result == OK) return true;
-            if(result == ERR_NOT_IN_RANGE) { creep.moveTo(road); return true; }
-        }
+        // const roads = creep.room.road?.filter((r: any) => {
+        //     if (!r || r.hits >= r.hitsMax * 0.8) return false;
+        //     if (!creep.pos.inRangeTo(r.pos, 1)) return false;
+        //     return true;
+        // });
+        // if (roads && roads.length > 0) {
+        //     const road = creep.pos.lookFor(LOOK_STRUCTURES).find((s) => s.structureType === STRUCTURE_ROAD && s.hits < s.hitsMax * 0.8) as StructureRoad;
+        //     let target = Game.getObjectById(creep.memory.cache.targetId) as StructureContainer | StructureStorage;
+        //     const result = creep.repair(road);
+        //     if (target && !creep.pos.inRangeTo(target, 1)) {
+        //         creep.moveTo(target);
+        //     }
+        //     if (creep.pos.isRoomEdge()) {
+        //         creep.moveToRoom(creep.room.name, { plainCost: 2, swampCost: 10 });
+        //     }
+        //     // repair同时moveTo target，节省时间
+        //     if (result == OK) {
+        //         return true;
+        //     }
+        //     if (result == ERR_NOT_IN_RANGE) { creep.moveTo(road); return true; }
+        // }
 
         // 使用 buildRoad 方法建造道路
         if (creep.buildRoad()) {
@@ -241,7 +263,7 @@ const outCarry = {
         return false;
     },
 
-    source: function(creep: Creep) {
+    source: function (creep: Creep) {
         if (creep.store.getFreeCapacity() === 0) {
             return true;
         }
@@ -253,7 +275,7 @@ const outCarry = {
         return false;
     },
 
-    target: function(creep: Creep) {
+    target: function (creep: Creep) {
         if (creep.store.getUsedCapacity() === 0) {
             return true;
         }

@@ -21,7 +21,8 @@
     "declaration": false, // 生成声明文件
     "sourceMap": true, // 生成源映射文件
     "noImplicitAny": false, // 是否禁止隐式的 any 类型
-    "experimentalDecorators": true // 是否启用实验性的装饰器
+    "experimentalDecorators": true, // 是否启用实验性的装饰器
+    "allowUmdGlobalAccess": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"]

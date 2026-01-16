@@ -52,8 +52,8 @@ const aid_build = {
             includeRuin: true,
             includeContainer: true,
             includeStorage: true,
-            minDroppedAmount: 50,
-            minContainerAmount: 0
+            minDroppedAmount: 150,
+            minContainerAmount: creep.store.getCapacity()
         })) {
             // 检查是否收集完成
             const freeCapacity = creep.store.getFreeCapacity();

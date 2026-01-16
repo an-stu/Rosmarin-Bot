@@ -10,7 +10,7 @@ import { EventModule } from '@/modules/event';
 import { ClearModule  } from '@/modules/function/ClearModule';
 import { GeneratePixel } from '@/modules/function/Pixel';
 import { Statistics } from '@/modules/function/Statistics'
-import { FlagSpawn } from '@/modules/flagSpawn';
+import { FlagSpawn } from '@/modules/FlagSpawn';
 import { ResourceManage } from '@/modules/ResourceManage';
 import TeamModule from '@/modules/team/TeamModule';
 

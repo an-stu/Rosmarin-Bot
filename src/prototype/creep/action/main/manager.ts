@@ -184,13 +184,10 @@ const ManagerAction = {
         if (!creep.memory.dontPullMe) creep.memory.dontPullMe = true;
         const storage = creep.room.storage;
         const terminal = creep.room.terminal;
-
         // 取放Link
         if (LinkEnergyTransfer(creep)) return;
-    
         // 搬运任务
         if (managerMission(creep)) return;
-
         // 将身上的资源存放到storage、terminal中
         const resourceType = Object.keys(creep.store)[0] as ResourceConstant;
         const target = storage?.store.getFreeCapacity(RESOURCE_ENERGY) > 0 ? storage :
@@ -199,10 +196,9 @@ const ManagerAction = {
             creep.goTransfer(target, resourceType);
             return true;
         }
-        
         // 没有任务时移动到布局中心
         const center = Memory['RoomControlData'][creep.room.name]?.center;
-        if (center && creep.pos.inRangeTo(center.x, center.y, 2)) {
+        if (center) {
             const pos = new RoomPosition(center.x, center.y, creep.room.name);
             if (!creep.pos.isEqualTo(pos)) {
                 creep.moveTo(pos, { visualizePathStyle: { stroke: '#ffffff' } });

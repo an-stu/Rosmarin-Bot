@@ -31,10 +31,11 @@ const RoleSpawnCheck = {
     },
     'carrier': (room: Room, current: number) => {
         const num = RoleLevelData['carrier'][room.level]['num'];
+        // 更改carrier数量逻辑：根据矿物和container决定是否需要carrier
         if (num > 0) return current < num;
-        if (current >= 1) return false;
-        if (room.mineral?.mineralAmount > 0) return true;
-        if (room.container?.some((c) => c.store.getUsedCapacity() > 1000)) return true;
+        if (current >= 3) return false;
+        // if (room.extractor && room.mineral?.mineralAmount > 0) return true;
+        if (room.container?.some((c) => c.store.getUsedCapacity() > 1000 && c.pos.isNearTo(room.controller?.pos))) return true;
         return false;
     },
     'worker': (room: Room, current: number) => {

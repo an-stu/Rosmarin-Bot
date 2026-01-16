@@ -6,6 +6,7 @@
   "scripts": {
     "build": "rollup -cw",
     "push": "rollup -cw --environment DEST:main",
+    "ppush": "rollup -cw --environment DEST:pserver",
     "sim": "rollup -cw --environment DEST:sim",
     "local": "rollup -cw --environment DEST:local",
     "commit": "git add . && git-cz",
@@ -37,7 +38,9 @@
   },
   "dependencies": {
     "git-cz": "^4.9.0",
+    "git-rev-sync": "^3.0.2",
     "inquirer": "^12.2.0",
+    "screeps-api": "^1.7.2",
     "shelljs": ">=0.8.5",
     "source-map": "^0.6.1",
     "source-map-js": "^1.0.2"

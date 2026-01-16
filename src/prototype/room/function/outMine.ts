@@ -72,7 +72,7 @@ export default class OutMine extends Room {
             const myUserName = this.controller.owner.username;
             if (controller?.owner && controller.owner.username !== myUserName) continue;
 
-            if (this.level >= 3) outReserverSpawn(this, targetRoom);    // 预定
+            if (this.level >= 4) outReserverSpawn(this, targetRoom);    // 预定
 
             if (controller.reservation &&
                 controller.reservation.username !== myUserName) continue;
@@ -513,6 +513,8 @@ const outDefendSpawn = function (homeRoom: Room, targetRoom: Room, hostiles: Cre
 }
 
 const outDoubleDefendSpawn = function (homeRoom: Room, targetRoom: Room, hostiles: Creep[]) {
+    // 等级太低不孵化，打不过
+    if (homeRoom.level < 3) return false;
     if (hostiles.length == 0) return false;
 
     const CreepByTargetRoom = getCreepByTargetRoom(targetRoom.name);

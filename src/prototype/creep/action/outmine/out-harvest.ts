@@ -97,7 +97,7 @@ const outHarvest = {
                 filter: (structure) => structure.structureType == STRUCTURE_CONTAINER
             })[0];
         }
-
+        // console.log(this.pos, targetContainer)
         if (!targetContainer) {
             // 没有容器时的处理
             this.handleNoContainer(creep);
@@ -119,6 +119,7 @@ const outHarvest = {
 
         // 建造容器
         this.buildContainer(creep);
+        // console.log(this.pos)
     },
 
     handleWithContainer: function(creep, container) {

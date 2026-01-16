@@ -47,10 +47,8 @@ const pluginDeploy =
         config && config.copyPath ?
         // 复制到指定路径
         runCopy() : 
-        config && config.token ?
         // 上传到screeps
-        screeps({ config, dayRun: !config }) :
-        '';
+        screeps({ config, dayRun: !config });
 
 export default {
     input: 'src/main.ts',

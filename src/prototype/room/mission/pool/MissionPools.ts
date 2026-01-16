@@ -44,6 +44,8 @@ export default class MissionPools extends Room {
     private getPool(PoolName: string) {
         const memory = Memory.MissionPools[this.name];
         if(!memory) return null;
+        // console.log(typeof memory[PoolName]);
+        if (!memory[PoolName]) { memory[PoolName] = []; }
         if(memory[PoolName]) return memory[PoolName];
         console.log(`房间 ${this.name} 的任务池 ${PoolName} 不存在`);
         return null;
@@ -111,7 +113,6 @@ export default class MissionPools extends Room {
         // 筛选未锁且有效的任务
         if (!filter) filter = () => true;
         const unlockedTasks = tasks.filter(task => task && !task.lock && filter(task));
-
         if (unlockedTasks.length === 0) return null; // 如果没有可用任务，返回null
         if (unlockedTasks.length === 1) return unlockedTasks[0]; // 如果只有一个任务，返回该任务
         let resultTasks = [], level = Infinity;
