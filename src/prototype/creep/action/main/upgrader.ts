@@ -53,10 +53,7 @@ const upgrade = function (creep: Creep) {
                 });
                 // console.log(creep.name + ' upgrader road move to validPositions: ' + JSON.stringify(validPositions));
                 if (validPositions.length > 0) {
-                    // 找到距离当前creep最近的位置
-                    const targetPos = validPositions.reduce((prev, curr) => {
-                        return prev.getRangeTo(creep) < curr.getRangeTo(creep) ? prev : curr;
-                    });
+                    const targetPos = validPositions[0];
                     creep.moveTo(targetPos, { visualizePathStyle: { stroke: '#ffffff' } });
                 }
             } else if (container) {
