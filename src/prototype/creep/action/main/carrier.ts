@@ -214,7 +214,7 @@ const carry = (creep: Creep) => {
                 cache.resourceType = RESOURCE_ENERGY;
             }
         } else if (!memory.dropWithdraw && controllerContainer &&
-            store[RESOURCE_ENERGY] > 0 && controllerContainer.store.getFreeCapacity() > 0) {
+            store[RESOURCE_ENERGY] > 0 && controllerContainer.store.getFreeCapacity() > 1200) {
             // 填充控制器容器
             cache.targetId = controllerContainer.id;
             cache.resourceType = RESOURCE_ENERGY;
