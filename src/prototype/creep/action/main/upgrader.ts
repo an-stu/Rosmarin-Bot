@@ -31,11 +31,36 @@ const upgrade = function (creep: Creep) {
         const road = creep.pos.lookFor(LOOK_STRUCTURES).find(s => s.structureType === STRUCTURE_ROAD);
         if (road) {
             const container = creep.room.container.find(c => c.pos.inRangeTo(creep.room.controller, 2));
-            if (container) {
-                creep.moveTo(container.pos, { visualizePathStyle: { stroke: '#ffffff' } });
-            }
-            else {
-                creep.moveTo(creep.room.controller.pos, { visualizePathStyle: { stroke: '#ffffff' } });
+            // 如果container上已经存在creep，则移动到controller旁边
+            const containerCreep = container?.pos.lookFor(LOOK_CREEPS).find(c => c.id !== creep.id);
+            if (container && containerCreep) {
+                // 移到一个没有creep的controller旁边位置，先得到位置，尽可能与controller和container同时相邻
+                // 注意 位置上不能有墙，不能有creep 必须与controller在2格范围内 必须与container在1格范围内 不要使用adjacentTo方法
+                const positions = [];
+                for (let x = container.pos.x - 1; x <= container.pos.x + 1; x++) {
+                    for (let y = container.pos.y - 1; y <= container.pos.y + 1; y++) {
+                        const pos = new RoomPosition(x, y, creep.room.name);
+                        if (pos.isNearTo(container.pos) && pos.inRangeTo(creep.room.controller.pos, 2)) {
+                            positions.push(pos);
+                        }
+                    }
+                }
+                // 过滤掉有墙和creep的位置
+                const validPositions = positions.filter(p => {
+                    const structures = p.lookFor(LOOK_STRUCTURES);
+                    const creeps = p.lookFor(LOOK_CREEPS);
+                    return !structures.some(s => s.structureType === STRUCTURE_WALL) && creeps.length === 0;
+                });
+                // console.log(creep.name + ' upgrader road move to validPositions: ' + JSON.stringify(validPositions));
+                if (validPositions.length > 0) {
+                    // 找到距离当前creep最近的位置
+                    const targetPos = validPositions.reduce((prev, curr) => {
+                        return prev.getRangeTo(creep) < curr.getRangeTo(creep) ? prev : curr;
+                    });
+                    creep.moveTo(targetPos, { visualizePathStyle: { stroke: '#ffffff' } });
+                }
+            } else if (container) {
+                creep.moveTo(container, { visualizePathStyle: { stroke: '#ffffff' } });
             }
         }
 
