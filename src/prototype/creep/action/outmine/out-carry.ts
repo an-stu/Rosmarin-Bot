@@ -217,14 +217,13 @@ const outCarry = {
         const road = creep.pos.lookFor(LOOK_STRUCTURES).find((s) => s.structureType === STRUCTURE_ROAD) as StructureRoad;
         if (road) {
             if (road.hits < road.hitsMax / 10 * 9) {
-                creep.repair(road)
+                creep.repair(road);
+                return true;
             }
             if (road.hits > road.hitsMax / 10 * 8 && target && !creep.pos.inRangeTo(target, 1)) {
                 creep.moveTo(target);
+                return true;
             }
-        }
-        else {
-            creep.moveTo(target)
         }
 
         // 使用 repairRoad 方法维修道路

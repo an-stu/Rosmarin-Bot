@@ -16,7 +16,7 @@ const RoleSpawnCheck = {
     'transport': (room: Room, current: number) => {
         const num = RoleLevelData['transport'][room.level]['num'];
         let energy = (room.storage?.store[RESOURCE_ENERGY] || 0) +
-                        (room.terminal?.store[RESOURCE_ENERGY] || 0);
+            (room.terminal?.store[RESOURCE_ENERGY] || 0);
         if (energy < 10000) return false;
         return current < num && (room.storage || room.terminal);
     },
@@ -34,8 +34,8 @@ const RoleSpawnCheck = {
         // 更改carrier数量逻辑：根据矿物和container决定是否需要carrier
         if (num > 0) return current < num;
         if (current >= 3) return false;
-        // if (room.extractor && room.mineral?.mineralAmount > 0) return true;
-        if (room.container?.some((c) => c.store.getUsedCapacity() > 1000 && c.pos.isNearTo(room.controller?.pos))) return true;
+        if (room.extractor && room.mineral?.mineralAmount > 0) return true;
+        if (room.container?.some((c) => c.store.getUsedCapacity() < 100 && c.pos.isNearTo(room.controller?.pos))) return true;
         return false;
     },
     'worker': (room: Room, current: number) => {
@@ -62,7 +62,7 @@ const RoleSpawnCheck = {
         if (room.memory.defend) return false;
         if (!room.storage) return false;
         if (!room.extractor) return false;
-        if (room.mineral.mineralAmount < 0) return false;
+        if (room.mineral.mineralAmount <= 0) return false;
         // 检查storage是否有足够空间
         const store = room.storage.store;
         if (store.getUsedCapacity() > store.getCapacity() * 0.95) return false;
@@ -97,7 +97,7 @@ const RoleSpawnCheck = {
         let num = match ? parseInt(match[1]) : 0;
         if (num < 1) return false;
         if (room.level >= 4 && room[RESOURCE_ENERGY] < 100000) return false;
-        
+
         return current < num;
     },
     'UP-repair': (room: Room, current: number) => {
@@ -107,7 +107,7 @@ const RoleSpawnCheck = {
         const match = UPFlag.name.match(/UP-REPAIR\/(\d+)/);
         let num = match ? parseInt(match[1]) : 0;
         if (num < 1) return false;
-        if (room.level < 7)  return false;
+        if (room.level < 7) return false;
         if (room[RESOURCE_ENERGY] < 100000) return false;
         return current < num;
     },
@@ -123,7 +123,7 @@ const RoleSpawnCheck = {
 
 function UpdateSpawnMission(room: Room) {
     if (!room.spawn) return false;
-    
+
     const CreepNum = room.getCreepNum();
     const SpawnMissionNum = room.getSpawnMissionNum();
 
@@ -144,4 +144,4 @@ function UpdateSpawnMission(room: Room) {
 }
 
 
-export {UpdateSpawnMission}
+export { UpdateSpawnMission }
