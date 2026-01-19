@@ -1,4 +1,4 @@
-import { compress, decompress} from '@/utils';
+import { compress, decompress } from '@/utils';
 
 const upgrade = function (creep: Creep) {
     if (creep.room.level == 8) {
@@ -18,7 +18,7 @@ const upgrade = function (creep: Creep) {
         const botMem = Memory['RoomControlData'][creep.room.name];
         const sign = botMem?.sign ?? global.BASE_CONFIG.DEFAULT_SIGN;
         const oldSign = creep.room.controller.sign?.text ?? '';
-        if(creep.room.controller && sign && oldSign != sign) {
+        if (creep.room.controller && sign && oldSign != sign) {
             if (creep.pos.inRangeTo(creep.room.controller, 1)) {
                 creep.signController(creep.room.controller, sign);
             } else {
@@ -27,21 +27,21 @@ const upgrade = function (creep: Creep) {
         }
     }
     const link = creep.room.link.find(l => l.pos.inRangeTo(creep.room.controller, 2))
-    if(creep.store[RESOURCE_ENERGY] < 50) {
+    if (creep.store[RESOURCE_ENERGY] < 50) {
         const target = [link, creep.room.storage, creep.room.terminal]
             .find(l => l && l.store[RESOURCE_ENERGY] > 50 && creep.pos.inRangeTo(l, 1));
-        if(target) creep.withdraw(target, RESOURCE_ENERGY);
+        if (target) creep.withdraw(target, RESOURCE_ENERGY);
     }
 
     if (Game.time % 30 == 0 &&
         !creep.pos.inRangeTo(creep.room.controller, 1) &&
-        creep.pos.inRangeTo(creep.room.controller, 3)){
+        creep.pos.inRangeTo(creep.room.controller, 3)) {
         nearController(creep);
     }
     return;
 }
 
-const nearController = function(creep: Creep) {
+const nearController = function (creep: Creep) {
     const controller = creep.room.controller;
     const terminal = creep.room.terminal;
     const storage = creep.room.storage;
@@ -52,29 +52,29 @@ const nearController = function(creep: Creep) {
     const posS = storage?.pos;
     const posL = link?.pos;
     const posC = creep.pos;
-    
+
     if (!global.spup_noCreep_area) global.spup_noCreep_area = {};
     if (!global.spup_noCreep_area[creep.room.name] ||
         global.spup_noCreep_area[creep.room.name].time != Game.time
     ) {
         let posTs = [], posSs = [], posLs = [];
         if (posT) posTs = [
-            [posT.x - 1, posT.y],[posT.x + 1, posT.y],[posT.x, posT.y - 1],[posT.x, posT.y + 1],
-            [posT.x - 1, posT.y - 1],[posT.x - 1, posT.y + 1],[posT.x + 1, posT.y - 1],[posT.x + 1, posT.y + 1],
+            [posT.x - 1, posT.y], [posT.x + 1, posT.y], [posT.x, posT.y - 1], [posT.x, posT.y + 1],
+            [posT.x - 1, posT.y - 1], [posT.x - 1, posT.y + 1], [posT.x + 1, posT.y - 1], [posT.x + 1, posT.y + 1],
         ]
         if (posS) posSs = [
-            [posS.x - 1, posS.y],[posS.x + 1, posS.y],[posS.x, posS.y - 1],[posS.x, posS.y + 1],
-            [posS.x - 1, posS.y - 1],[posS.x - 1, posS.y + 1],[posS.x + 1, posS.y - 1],[posS.x + 1, posS.y + 1],
+            [posS.x - 1, posS.y], [posS.x + 1, posS.y], [posS.x, posS.y - 1], [posS.x, posS.y + 1],
+            [posS.x - 1, posS.y - 1], [posS.x - 1, posS.y + 1], [posS.x + 1, posS.y - 1], [posS.x + 1, posS.y + 1],
         ]
         if (posL) posLs = [
-            [posL.x - 1, posL.y],[posL.x + 1, posL.y],[posL.x, posL.y - 1],[posL.x, posL.y + 1],
-            [posL.x - 1, posL.y - 1],[posL.x - 1, posL.y + 1],[posL.x + 1, posL.y - 1],[posL.x + 1, posL.y + 1],
+            [posL.x - 1, posL.y], [posL.x + 1, posL.y], [posL.x, posL.y - 1], [posL.x, posL.y + 1],
+            [posL.x - 1, posL.y - 1], [posL.x - 1, posL.y + 1], [posL.x + 1, posL.y - 1], [posL.x + 1, posL.y + 1],
         ];
         let arr = [...posTs, ...posSs];
         if (arr.length == 0) arr = [...posLs];
         const noCreep = arr.filter((p) => {
             return terrain.get(p[0], p[1]) !== TERRAIN_MASK_WALL &&
-            (new RoomPosition(p[0], p[1], creep.room.name)).lookFor(LOOK_CREEPS).length === 0;
+                (new RoomPosition(p[0], p[1], creep.room.name)).lookFor(LOOK_CREEPS).length === 0;
         }).map((p) => compress(p[0], p[1]));
         global.spup_noCreep_area[creep.room.name] = {
             time: Game.time,
@@ -85,7 +85,7 @@ const nearController = function(creep: Creep) {
     const noCreep = global.spup_noCreep_area[creep.room.name].noCreep;
 
     for (const p of noCreep) {
-        const [x,y] = decompress(p);
+        const [x, y] = decompress(p);
         const pos = new RoomPosition(x, y, creep.room.name);
         if (creep.pos.isNearTo(pos) &&
             getDistance(pos, controller.pos) < getDistance(posC, controller.pos)) {
@@ -95,7 +95,7 @@ const nearController = function(creep: Creep) {
     }
 }
 
-const getDistance = function(pos1: RoomPosition, pos2: RoomPosition) {
+const getDistance = function (pos1: RoomPosition, pos2: RoomPosition) {
     return Math.abs(pos1.x - pos2.x) + Math.abs(pos1.y - pos2.y);
 }
 
@@ -113,14 +113,14 @@ function withdrawEnergy(creep) {
         // 周围的非冲级爬均允许对穿, 避免堵路
         creep.room.lookForAtArea(LOOK_CREEPS,
             Math.max(0, creep.pos.y - 1), Math.max(0, creep.pos.x - 1),
-            Math.min(49,creep.pos.y + 1), Math.min(49,creep.pos.x + 1), true)
+            Math.min(49, creep.pos.y + 1), Math.min(49, creep.pos.x + 1), true)
             .filter(c => c.creep.memory?.role !== 'UP-upgrade')
             .forEach(c => {
                 c.creep.memory.dontPullMe = false
             });
     }
 
-    let area = [[-1,-1], [-1,0], [-1,1], [0,-1], [0,1], [1,-1], [1,0], [1,1]];
+    let area = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]];
 
     if (link && link.store[RESOURCE_ENERGY] > 0 && creep.pos.isNearTo(container)) {
         creep.withdraw(link, RESOURCE_ENERGY)
@@ -135,28 +135,28 @@ function withdrawEnergy(creep) {
         creep.withdraw(storage, RESOURCE_ENERGY)
     }
     else if (terminal && terminal.store[RESOURCE_ENERGY] > 0 && area.some(p => {
-            const pos = [terminal.pos.x + p[0], terminal.pos.y + p[1]];
-            return terrain.get(pos[0], pos[1]) !== TERRAIN_MASK_WALL &&
-                !creep.room.lookForAt(LOOK_CREEPS, pos[0], pos[1]).length &&
-                !creep.room.lookForAt(LOOK_STRUCTURES, pos[0], pos[1]).some(s => 
-                    s.structureType !== STRUCTURE_ROAD &&
-                    s.structureType !== STRUCTURE_CONTAINER &&
-                    s.structureType !== STRUCTURE_RAMPART
-                )
-        })
+        const pos = [terminal.pos.x + p[0], terminal.pos.y + p[1]];
+        return terrain.get(pos[0], pos[1]) !== TERRAIN_MASK_WALL &&
+            !creep.room.lookForAt(LOOK_CREEPS, pos[0], pos[1]).length &&
+            !creep.room.lookForAt(LOOK_STRUCTURES, pos[0], pos[1]).some(s =>
+                s.structureType !== STRUCTURE_ROAD &&
+                s.structureType !== STRUCTURE_CONTAINER &&
+                s.structureType !== STRUCTURE_RAMPART
+            )
+    })
     ) { creep.goWithdraw(terminal, RESOURCE_ENERGY) }
     else if (storage && storage.store[RESOURCE_ENERGY] > 0 && area.some(p => {
-            const pos = [storage.pos.x + p[0], storage.pos.y + p[1]];
-            return terrain.get(pos[0], pos[1]) !== TERRAIN_MASK_WALL &&
-                !creep.room.lookForAt(LOOK_CREEPS, pos[0], pos[1]).length &&
-                !creep.room.lookForAt(LOOK_STRUCTURES, pos[0], pos[1]).some(s => 
-                    s.structureType !== STRUCTURE_ROAD &&
-                    s.structureType !== STRUCTURE_CONTAINER &&
-                    s.structureType !== STRUCTURE_RAMPART
-                )
-        })
+        const pos = [storage.pos.x + p[0], storage.pos.y + p[1]];
+        return terrain.get(pos[0], pos[1]) !== TERRAIN_MASK_WALL &&
+            !creep.room.lookForAt(LOOK_CREEPS, pos[0], pos[1]).length &&
+            !creep.room.lookForAt(LOOK_STRUCTURES, pos[0], pos[1]).some(s =>
+                s.structureType !== STRUCTURE_ROAD &&
+                s.structureType !== STRUCTURE_CONTAINER &&
+                s.structureType !== STRUCTURE_RAMPART
+            )
+    })
     ) { creep.goWithdraw(storage, RESOURCE_ENERGY) }
-    else creep.TakeEnergy();
+    // else creep.TakeEnergy();
 }
 
 
@@ -167,15 +167,15 @@ const UpUpgradeFunction = {
     },
 
     target: function (creep: Creep) {   // 升级控制器
-        if(!creep.memory.ready) return false;
-        if(creep.ticksToLive < 10) {
-            if(creep.unboost()) creep.suicide();
+        if (!creep.memory.ready) return false;
+        if (creep.ticksToLive < 10) {
+            if (creep.unboost()) creep.suicide();
             return false;
         }
         if (creep.store.getUsedCapacity() === 0) {
             return true;
         }
-        if(creep.ticksToLive < 100) {
+        if (creep.ticksToLive < 100) {
             creep.memory.dontPullMe = false;
         } else if (!creep.memory.dontPullMe) {
             creep.memory.dontPullMe = true;
@@ -185,15 +185,15 @@ const UpUpgradeFunction = {
     },
 
     source: function (creep: Creep) {   // 获取能量
-        if(!creep.memory.ready) return false;
-        if(!creep.moveHomeRoom()) return;
-        if(!creep.memory.boosted) {
+        if (!creep.memory.ready) return false;
+        if (!creep.moveHomeRoom()) return;
+        if (!creep.memory.boosted) {
             let result = creep.goBoost(['XGH2O', 'GH2O', 'GH']);
             creep.memory.boosted = result;
-            if(!result) return;
+            if (!result) return;
         }
-        if(creep.ticksToLive < 10) {
-            if(creep.unboost()) creep.suicide();
+        if (creep.ticksToLive < 10) {
+            if (creep.unboost()) creep.suicide();
             return false;
         }
         if (creep.store.getFreeCapacity() === 0) {
