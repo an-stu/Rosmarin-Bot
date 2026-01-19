@@ -1,31 +1,32 @@
+import { OUTMINE_CONFIG } from '@/constant/config';
 const power_carry = {
-    source: function(creep: Creep) {
-        let powerTombstone = creep.room.find(FIND_TOMBSTONES,{filter: (r) => r.store.getUsedCapacity(RESOURCE_POWER) > 0})[0];
+    source: function (creep: Creep) {
+        let powerTombstone = creep.room.find(FIND_TOMBSTONES, { filter: (r) => r.store.getUsedCapacity(RESOURCE_POWER) > 0 })[0];
         if (powerTombstone) {
             creep.memory['powerTombstoneId'] = powerTombstone.id;
             creep.goWithdraw(powerTombstone as any, RESOURCE_POWER);
             return false;
         }
-        if(creep.store.getFreeCapacity(RESOURCE_POWER) === 0) {
+        if (creep.store.getFreeCapacity(RESOURCE_POWER) === 0) {
             return true;
         }
-        
+
         if (creep.room.name != creep.memory.targetRoom || creep.pos.isRoomEdge()) {
-            creep.moveToRoom(creep.memory.targetRoom, {bypassRange:10});
+            creep.moveToRoom(creep.memory.targetRoom, { bypassRange: 10 });
             return;
         }
 
-        
-        let powerBank = creep.room.powerBank?.[0];
+
+        let powerBank = creep.room.powerBank?.filter(pb => pb.power >= OUTMINE_CONFIG.POWER_MIN_AMOUNT)[0];
         if (!powerBank) {
             creep.room.update(STRUCTURE_POWER_BANK);
-            powerBank = creep.room.powerBank?.[0];
+            powerBank = creep.room.powerBank?.filter(pb => pb.power >= OUTMINE_CONFIG.POWER_MIN_AMOUNT)[0];
         }
         if (powerBank) {
             creep.memory['powerBankId'] = powerBank.id;
             // 靠近powerBank
             if (!creep.pos.inRangeTo(powerBank, 3)) {
-                creep.moveTo(powerBank, {range: 3, ignoreCreeps: false});
+                creep.moveTo(powerBank, { range: 3, ignoreCreeps: false });
                 return false;
             }
         }
@@ -43,25 +44,25 @@ const power_carry = {
             return;
         }
         // 再处理能找到的目标
-        powerDropped = creep.room.find(FIND_DROPPED_RESOURCES,{filter: (r) => r.resourceType == RESOURCE_POWER})[0];
+        powerDropped = creep.room.find(FIND_DROPPED_RESOURCES, { filter: (r) => r.resourceType == RESOURCE_POWER })[0];
         if (powerDropped) {
             creep.memory['powerDroppedId'] = powerDropped.id;
             creep.goPickup(powerDropped);
             return;
         }
-        powerRuin = creep.room.find(FIND_RUINS,{filter: (r) => r.store.getUsedCapacity(RESOURCE_POWER) > 0})[0];
+        powerRuin = creep.room.find(FIND_RUINS, { filter: (r) => r.store.getUsedCapacity(RESOURCE_POWER) > 0 })[0];
         if (powerRuin) {
             creep.memory['powerRuinId'] = powerRuin.id;
             creep.goWithdraw(powerRuin, RESOURCE_POWER);
             return;
         }
-        
+
         // 如果都没有, 那么做如下处理。
         if (!powerBank && !powerDropped && !powerRuin) {
-            _.filter(Game.creeps, (c) => 
+            _.filter(Game.creeps, (c) =>
                 c.memory.role == 'power-carry' &&
                 c.memory.targetRoom == creep.room.name)
-                .forEach((c) => {c.memory['suicide'] = true});
+                .forEach((c) => { c.memory['suicide'] = true });
             if (creep.store.getUsedCapacity(RESOURCE_POWER) === 0) {
                 creep.suicide();
                 return false;
@@ -70,10 +71,10 @@ const power_carry = {
                 return true;
             }
         }
-        
+
         return creep.store.getFreeCapacity(RESOURCE_POWER) === 0;
     },
-    target: function(creep: Creep) {
+    target: function (creep: Creep) {
         if (creep.room.name != creep.memory.homeRoom || creep.pos.isRoomEdge()) {
             creep.moveToRoom(creep.memory.homeRoom);
             return;
@@ -84,7 +85,12 @@ const power_carry = {
             if (creep.pos.isNearTo(storage)) {
                 creep.transfer(storage, RESOURCE_POWER);
                 if (creep.memory['suicide']) {
-                    creep.suicide();
+                    // creep.suicide();
+                    // 使用spawn进行recycle
+                    const spawn = creep.room.find(FIND_MY_SPAWNS)[0];
+                    if (spawn && spawn.recycleCreep(creep) == ERR_NOT_IN_RANGE) {
+                        creep.moveTo(spawn);
+                    }
                 }
             } else {
                 creep.moveTo(storage);
