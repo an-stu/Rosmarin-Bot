@@ -107,7 +107,6 @@ function withdrawEnergy(creep) {
     const terminal = [creep.room.terminal].find(t => t && t.pos.inRangeTo(creep.room.controller, 3)) ?? null;
     const storage = [creep.room.storage].find(s => s && s.pos.inRangeTo(creep.room.controller, 4)) ?? null;
     const terrain = creep.room.getTerrain();
-
     if ((storage && creep.pos.inRangeTo(storage, 2)) ||
         (terminal && creep.pos.inRangeTo(terminal, 2))) {
         // 周围的非冲级爬均允许对穿, 避免堵路
