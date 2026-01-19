@@ -22,6 +22,11 @@ export default class WorkFunction extends Creep {
         if (!resourceType) resourceType = Object.keys(target.store)[0] as ResourceConstant;
         let result = this.withdraw(target, resourceType, ...args);
         if (result === ERR_NOT_IN_RANGE) {
+            // 如果在边缘时候使用getDirectionTo进行移动
+            if (this.pos.isRoomEdge()) {
+                const direction = this.pos.getDirectionTo(target);
+                if (this.move(direction) == OK) return false;
+            }
             this.moveTo(target, {
                 visualizePathStyle: { stroke: '#ffaa00' },
                 maxRooms: 1,

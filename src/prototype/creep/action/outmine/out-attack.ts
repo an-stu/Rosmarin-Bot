@@ -1,6 +1,6 @@
 const outAttack = {
     run: function (creep: Creep) {
-        if (creep.room.name != creep.memory.targetRoom || creep.pos.isRoomEdge()) {
+        if (creep.room.name != creep.memory.targetRoom) {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
         }

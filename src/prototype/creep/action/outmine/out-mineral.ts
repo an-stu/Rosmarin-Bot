@@ -1,6 +1,6 @@
 const outMineral = {
-    source: function (creep: Creep) {        
-        if (creep.room.name != creep.memory.targetRoom || creep.pos.isRoomEdge()) {
+    source: function (creep: Creep) {
+        if (creep.room.name != creep.memory.targetRoom) {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
         }
@@ -29,21 +29,21 @@ const outMineral = {
         return creep.store.getFreeCapacity() == 0;
     },
 
-    transferToNearbyCarrier: function(creep) {
+    transferToNearbyCarrier: function (creep) {
         const res = Object.keys(creep.store)[0];
         const nearbyCarrier = creep.pos.findInRange(FIND_MY_CREEPS, 1, {
             filter: (c) => ((c.memory.role === 'out-carry' || c.memory.role === 'out-car') &&
-                    c.store.getFreeCapacity(res) > 0)
+                c.store.getFreeCapacity(res) > 0)
         })[0];
 
-        if (nearbyCarrier){
+        if (nearbyCarrier) {
             if (creep.transfer(nearbyCarrier, res) === OK) return true;
         }
 
         return false;
     },
 
-    handleNoContainer: function(creep: Creep) {
+    handleNoContainer: function (creep: Creep) {
         let constructionSite = creep.pos.findInRange(FIND_CONSTRUCTION_SITES, 2, {
             filter: (site) => site.structureType === STRUCTURE_CONTAINER && site.my
         })[0];
@@ -66,7 +66,7 @@ const outMineral = {
         }
     },
 
-    handleWithContainer: function(creep, container) {
+    handleWithContainer: function (creep, container) {
         // 向容器放入资源
         if (creep.pos.isEqualTo(container)) {
             const res = Object.keys(creep.store)[0];
@@ -82,12 +82,12 @@ const outMineral = {
     target: function (creep: Creep) {
         // 尝试将矿传递给附近的运输单位
         if (this.transferToNearbyCarrier(creep)) return creep.store.getUsedCapacity() == 0;
-        
+
         // 查找附近的容器
         let targetContainer = creep.pos.findInRange(FIND_STRUCTURES, 2, {
             filter: (structure) => structure.structureType == STRUCTURE_CONTAINER
         })[0];
-        
+
         if (!targetContainer) {
             // 没有容器时的处理
             this.handleNoContainer(creep);
@@ -96,7 +96,7 @@ const outMineral = {
             this.handleWithContainer(creep, targetContainer);
         }
 
-        
+
         return creep.store.getUsedCapacity() == 0;
     }
 }

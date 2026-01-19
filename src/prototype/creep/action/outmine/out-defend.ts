@@ -1,6 +1,6 @@
 const outDefend = {
-    run: function(creep: Creep) {
-        if (creep.room.name != creep.memory.targetRoom || creep.pos.isRoomEdge()) {
+    run: function (creep: Creep) {
+        if (creep.room.name != creep.memory.targetRoom) {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
         }
@@ -8,16 +8,16 @@ const outDefend = {
             filter: (c) => !Memory['whitelist']?.includes(c.owner.username)
         });
         let targets = hostileCreeps as any;
-        if(targets.length == 0) {
+        if (targets.length == 0) {
             const invaderCores = creep.room.find(FIND_STRUCTURES, {
                 filter: (structure) => structure.structureType === STRUCTURE_INVADER_CORE
             });
             targets = invaderCores as any;
         }
-              
+
         if (targets.length > 0) {
             let target = targets.find(c => c.getActiveBodyparts?.(HEAL) > 0);
-            if(!target) {
+            if (!target) {
                 target = creep.pos.findClosestByRange(targets);
             }
             if (creep.getActiveBodyparts(ATTACK) > 0) {
@@ -57,7 +57,7 @@ const outDefend = {
             if (damagedCreeps.length > 0) {
                 const closestDamagedCreep = creep.pos.findClosestByRange(damagedCreeps);
                 const range = creep.pos.getRangeTo(closestDamagedCreep);
-                
+
                 if (range <= 1) {
                     creep.heal(closestDamagedCreep);
                 } else if (range <= 3) {
@@ -68,7 +68,7 @@ const outDefend = {
                 }
                 return;
             } else {
-                creep.moveTo(new RoomPosition(25, 25, creep.room.name), {range: 5});
+                creep.moveTo(new RoomPosition(25, 25, creep.room.name), { range: 5 });
             }
         }
 

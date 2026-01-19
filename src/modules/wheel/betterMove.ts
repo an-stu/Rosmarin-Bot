@@ -86,12 +86,12 @@ let pathClearDelay = 3000;  // 清理相应时间内都未被再次使用的路�
 let hostileCostMatrixClearDelay = 500; // 自动清理相应时间前创建的其他玩家房间的costMatrix
 let coreLayoutRange = 3; // 核心布局半径，在离storage这个范围内频繁检查对穿（减少堵路的等待
 // @ts-ignore
-let avoidRooms: any[] = Memory.bypassRooms ? Memory.bypassRooms : []; // 永不踏入这些房间
+let avoidRooms: any[] = Memory.bypassRooms ? Memory.bypassRooms : ['E5S7']; // 永不踏入这些房间
 let avoidExits = {
     'fromRoom': 'toRoom'
 }   // 【未启用】单向屏蔽房间的一些出口，永不从fromRoom踏入toRoom
 /** @type {{id:string, roomName:string, taskQueue:{path:MyPath, idx:number, roomName:string}[]}[]} */
-let observers = [];  // 如果想用ob寻路，把ob的id放这里
+let observers = ['696e3a4dc65a0501003290af'];  // 如果想用ob寻路，把ob的id放这里
 
 /***************************************
  *  局部缓存
@@ -1426,19 +1426,19 @@ Creep.prototype.moveTo = wrapFn(config.changeMoveTo ? betterMoveTo : originMoveT
 
 
 // module.exports
-global.BetterMove= {
+global.BetterMove = {
     // getPosMoveAble (pos){
     //     generateCostMatrix(Game.rooms[pos.roomName])
     //     if(pos.roomName in costMatrixCache)
     //         return (costMatrixCache[pos.roomName][false].get(pos.x,pos.y))
     // },
-    setChangeMove (bool) {
+    setChangeMove(bool) {
         //Creep.prototype.move = wrapFn(bool? betterMove : originMove, 'move');
         analyzeCPU.move = { sum: 0, calls: 0 };
         return OK;
     },
-    creepPathCache:creepPathCache,
-    setChangeMoveTo (bool) {
+    creepPathCache: creepPathCache,
+    setChangeMoveTo(bool) {
         Creep.prototype.moveTo = wrapFn(bool ? betterMoveTo : originMoveTo, 'moveTo');
         analyzeCPU.moveTo = { sum: 0, calls: 0 };
         testCacheHits = 0;
@@ -1453,12 +1453,12 @@ global.BetterMove= {
         cacheMissCost = 0;
         return OK;
     },
-    setChangeFindClostestByPath (bool) {
+    setChangeFindClostestByPath(bool) {
         // RoomPosition.prototype.findClosestByPath = wrapFn(bool? betterFindClosestByPath : originFindClosestByPath, 'findClosestByPath');
         analyzeCPU.findClosestByPath = { sum: 0, calls: 0 };
         return OK;
     },
-    setPathClearDelay (number) {
+    setPathClearDelay(number) {
         if (typeof number == "number" && number > 0) {
             pathClearDelay = Math.ceil(number);
             return OK;
@@ -1467,7 +1467,7 @@ global.BetterMove= {
         }
         return ERR_INVALID_ARGS;
     },
-    setHostileCostMatrixClearDelay (number) {
+    setHostileCostMatrixClearDelay(number) {
         if (typeof number == "number" && number > 0) {
             hostileCostMatrixClearDelay = Math.ceil(number);
             return OK;
@@ -1477,7 +1477,7 @@ global.BetterMove= {
         }
         return ERR_INVALID_ARGS;
     },
-    deleteCostMatrix (roomName) {
+    deleteCostMatrix(roomName) {
         delete costMatrixCache[roomName];
         return OK;
     },
@@ -1485,10 +1485,10 @@ global.BetterMove= {
     //     //if(!(fromPos instanceof RoomPosition))
     //     return 'not implemented'
     // },
-    getAvoidRoomsMap (){
+    getAvoidRoomsMap() {
         return avoidRooms
     },
-    addAvoidRooms (roomName) {
+    addAvoidRooms(roomName) {
         let splited = reg1.exec(roomName);
         if (splited && splited.length == 5) {
             avoidRooms[roomName] = 1;
@@ -1497,7 +1497,7 @@ global.BetterMove= {
             return ERR_INVALID_ARGS;
         }
     },
-    deleteAvoidRooms (roomName) {
+    deleteAvoidRooms(roomName) {
         let splited = reg1.exec(roomName);
         if (splited && splited.length == 5 && avoidRooms[roomName]) {
             delete avoidRooms[roomName];
@@ -1506,7 +1506,7 @@ global.BetterMove= {
             return ERR_INVALID_ARGS;
         }
     },
-    deletePathInRoom (roomName) {
+    deletePathInRoom(roomName) {
         let splited = reg1.exec(roomName);
         if (splited && splited.length == 5) {
             this.deleteCostMatrix(roomName);
@@ -1534,7 +1534,7 @@ global.BetterMove= {
             return ERR_INVALID_ARGS;
         }
     },
-    addAvoidExits (fromRoomName, toRoomName) {    // 【未启用】
+    addAvoidExits(fromRoomName, toRoomName) {    // 【未启用】
         let splited1 = reg1.exec(fromRoomName);
         let splited2 = reg1.exec(toRoomName);
         if (splited1 && splited1.length == 5 && splited2 && splited2.length == 5) {
@@ -1544,7 +1544,7 @@ global.BetterMove= {
             return ERR_INVALID_ARGS;
         }
     },
-    deleteAvoidExits (fromRoomName, toRoomName) { // 【未启用】
+    deleteAvoidExits(fromRoomName, toRoomName) { // 【未启用】
         let splited1 = reg1.exec(fromRoomName);
         let splited2 = reg1.exec(toRoomName);
         if (splited1 && splited1.length == 5 && splited2 && splited2.length == 5) {
@@ -1556,7 +1556,7 @@ global.BetterMove= {
             return ERR_INVALID_ARGS;
         }
     },
-    print () {
+    print() {
         let text = '\navarageTime\tcalls\tFunctionName';
         for (let fn in analyzeCPU) {
             text += `\n${(analyzeCPU[fn].sum / analyzeCPU[fn].calls).toFixed(5)}\t\t${analyzeCPU[fn].calls}\t\t${fn}`;
@@ -1581,7 +1581,7 @@ global.BetterMove= {
 
 
 
-if(!Creep.prototype.$moveTo) {
+if (!Creep.prototype.$moveTo) {
     Creep.prototype.originMoveTo = originMoveTo;
     PowerCreep.prototype.originMoveTo = originMoveTo;
     Creep.prototype.$moveTo = Creep.prototype.moveTo;
@@ -1595,7 +1595,7 @@ if(!Creep.prototype.$moveTo) {
             this.memory.lastPos.time += 1;
             isStuckTooLong = this.memory.lastPos.time > 6;
         } else {
-            this.memory.lastPos = {x: this.pos.x, y: this.pos.y, time: 0};
+            this.memory.lastPos = { x: this.pos.x, y: this.pos.y, time: 0 };
         }
 
         this.memory.dontPullMe = isNearEdge || isStuckTooLong;
@@ -1610,7 +1610,7 @@ if(!Creep.prototype.$moveTo) {
 //     return this.$move(...e)
 // };
 
-if(!Creep.prototype.$build) {
+if (!Creep.prototype.$build) {
     Creep.prototype.$build = Creep.prototype.build;
     Creep.prototype.build = function (...e) {
         this.memory.dontPullMe = true;
@@ -1618,7 +1618,7 @@ if(!Creep.prototype.$build) {
     };
 }
 
-if(!Creep.prototype.$repair) {
+if (!Creep.prototype.$repair) {
     Creep.prototype.$repair = Creep.prototype.repair;
     Creep.prototype.repair = function (...e) {
         this.memory.dontPullMe = true;
@@ -1626,7 +1626,7 @@ if(!Creep.prototype.$repair) {
     };
 }
 
-if(!Creep.prototype.$upgradeController) {
+if (!Creep.prototype.$upgradeController) {
     Creep.prototype.$upgradeController = Creep.prototype.upgradeController;
     Creep.prototype.upgradeController = function (...e) {
         this.memory.dontPullMe = true;
@@ -1634,7 +1634,7 @@ if(!Creep.prototype.$upgradeController) {
     };
 }
 
-if(!Creep.prototype.$dismantle) {
+if (!Creep.prototype.$dismantle) {
     Creep.prototype.$dismantle = Creep.prototype.dismantle;
     Creep.prototype.dismantle = function (...e) {
         this.memory.dontPullMe = true;
@@ -1642,7 +1642,7 @@ if(!Creep.prototype.$dismantle) {
     };
 }
 
-if(!Creep.prototype.$harvest) {
+if (!Creep.prototype.$harvest) {
     Creep.prototype.$harvest = Creep.prototype.harvest;
     Creep.prototype.harvest = function (...e) {
         this.memory.dontPullMe = true;
@@ -1650,9 +1650,9 @@ if(!Creep.prototype.$harvest) {
     };
 }
 
-if(!Creep.prototype.$attack){
-    Creep.prototype.$attack=Creep.prototype.attack;
-    Creep.prototype.attack=function (...e) {
+if (!Creep.prototype.$attack) {
+    Creep.prototype.$attack = Creep.prototype.attack;
+    Creep.prototype.attack = function (...e) {
         this.memory.dontPullMe = true;
         return this.$attack(...e)
     };

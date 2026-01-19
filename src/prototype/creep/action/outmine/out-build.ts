@@ -1,6 +1,6 @@
 const outBuild = {
-    harvest: function(creep) {
-        if (creep.room.name != creep.memory.targetRoom || creep.pos.isRoomEdge()) {
+    harvest: function (creep) {
+        if (creep.room.name != creep.memory.targetRoom) {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
         }
@@ -10,13 +10,13 @@ const outBuild = {
             if (target) {
                 if (creep.pos.inRangeTo(target, 1)) {
                     creep.withdraw(target, RESOURCE_ENERGY);
-                    if(!target || target.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
+                    if (!target || target.store.getUsedCapacity(RESOURCE_ENERGY) == 0) {
                         creep.memory.cache.harvestTarget = null;
                         return;
                     }
                     creep.memory.cache.harvestTarget = null;
                 } else {
-                    creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' } });
+                    creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' }, maxRooms: 1 });
                 }
                 return;
             }
@@ -24,7 +24,7 @@ const outBuild = {
                 creep.memory.cache.harvestTarget = null;
             }
         }
-    
+
         // 查找容器
         let container = creep.room.find(FIND_STRUCTURES, {
             filter: (structure) => {
@@ -45,14 +45,14 @@ const outBuild = {
                 creep.withdraw(container, RESOURCE_ENERGY);
             }
             else {
-                creep.moveTo(container, { visualizePathStyle: { stroke: '#ffaa00' }})
+                creep.moveTo(container, { visualizePathStyle: { stroke: '#ffaa00' } })
             };
             return;
         } else {
             const source = creep.room.source?.[0];
             if (!source) return;
             if (!creep.pos.inRangeTo(source, 1)) {
-                creep.moveTo(source, {range: 3});
+                creep.moveTo(source, { range: 3 });
             }
             else {
                 creep.harvest(source);
@@ -60,7 +60,7 @@ const outBuild = {
             return;
         }
     },
-    build: function(creep) {
+    build: function (creep) {
         if (creep.room.name != creep.memory.targetRoom || creep.pos.isRoomEdge()) {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
@@ -73,7 +73,7 @@ const outBuild = {
                     creep.build(target);
                 }
                 else {
-                    creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' }, maxRooms: 1});
+                    creep.moveTo(target, { visualizePathStyle: { stroke: '#ffaa00' }, maxRooms: 1 });
                 }
             }
             else {
@@ -81,7 +81,7 @@ const outBuild = {
             }
             return;
         }
-        
+
         const targetRoom = Game.rooms[creep.memory.targetRoom];
         const constructionSite = targetRoom.find(FIND_CONSTRUCTION_SITES, {
             filter: (site) => site.structureType === STRUCTURE_ROAD || site.structureType === STRUCTURE_CONTAINER
@@ -98,14 +98,14 @@ const outBuild = {
             return;
         }
     },
-    target: function(creep) {
+    target: function (creep) {
         this.build(creep);
         if (creep.store.getUsedCapacity() == 0) {
             creep.say('🔄');
             return true;
         } else { return false; }
     },
-    source: function(creep) {
+    source: function (creep) {
         this.harvest(creep);
         if (creep.store.getFreeCapacity() == 0) {
             creep.say('🚧');

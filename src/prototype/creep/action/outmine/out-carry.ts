@@ -1,6 +1,6 @@
 const outCarry = {
     withdraw: function (creep: Creep) {
-        if (creep.room.name != creep.memory.targetRoom || creep.pos.isRoomEdge()) {
+        if (creep.room.name != creep.memory.targetRoom) {
             creep.moveToRoom(creep.memory.targetRoom, { plainCost: 2, swampCost: 10 });
             return;
         }
@@ -201,7 +201,7 @@ const outCarry = {
                 if (centerPos && creep.pos.inRangeTo(centerPos, 1)) {
                     creep.drop(Object.keys(creep.store)[0] as ResourceConstant);
                 } else {
-                    creep.moveTo(centerPos, {range: 1, plainCost: 2, swampCost: 10 });
+                    creep.moveTo(centerPos, { range: 1, plainCost: 2, swampCost: 10 });
                 }
             }
         }
