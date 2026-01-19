@@ -191,7 +191,7 @@ interface RoomControlMemory {
  * @description 单个房间的建筑运行参数
  */
 interface StructControlMemory {
-    labNum: number;
+    labNum?: number;
     // --------------------------------------------------------
     // PowerSpawn 配置
     // --------------------------------------------------------
@@ -791,26 +791,26 @@ interface RoadConfigType {
     PLAIN_COST: number;
     SWAMP_COST: number;
     MAX_OPS: number;
-    
+
     // 缓存配置
     COST_MATRIX_TTL: number;
     PATH_CACHE_TTL: number;
-    
+
     // 建造配置
     BUILD_INTERVAL: number;
     MAX_SITES_PER_ROUTE: number;
     ENERGY_ROAD_MIN_LEVEL: number;
     CENTER_ROAD_MIN_LEVEL: number;
-    
+
     // 维护配置
     HEALTH_CHECK_INTERVAL: number;
     REPAIR_THRESHOLD: number;
     CRITICAL_THRESHOLD: number;
-    
+
     // CPU 保护配置
     CPU_THRESHOLD: number;
     MAX_PATHS_PER_TICK: number;
-    
+
     // 数据格式版本
     DATA_VERSION: number;
 }

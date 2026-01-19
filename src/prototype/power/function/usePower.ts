@@ -33,7 +33,7 @@ export default class PowerCreepUsePower extends PowerCreep {
         if (this.room.my) {
             const roles = [
                 'power-attack', 'power-heal', 'power-carry', 'power-defend',
-                'deposit-harvest', 'deposit-transfer', 'out-attack',
+                'deposit-harvest', 'deposit-transfer', 'out-attack', 'out-mineral',
                 'team-attack', 'team-dismantle', 'team-ranged', 'team-heal',
             ]
             if (!Game.flags[this.name + '-upspawn'] && !this.room.memory.defend &&
