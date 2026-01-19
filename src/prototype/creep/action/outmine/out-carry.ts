@@ -123,20 +123,20 @@ const outCarry = {
         }
     },
 
-    carry: function (creep: any) {
+    carry: function (creep: Creep) {
         if (creep.room.name != creep.memory.homeRoom || creep.pos.isRoomEdge()) {
             creep.moveToRoom(creep.memory.homeRoom, { plainCost: 2, swampCost: 10 });
             return;
         }
 
-        let target: StructureContainer | StructureStorage;
+        let target: StructureContainer | StructureStorage | StructureTerminal;
 
         if (creep.memory.cache.targetId) {
-            target = Game.getObjectById(creep.memory.cache.targetId) as StructureContainer | StructureStorage;
+            target = Game.getObjectById(creep.memory.cache.targetId) as StructureContainer | StructureStorage | StructureTerminal;
             if (target) {
                 if (creep.pos.inRangeTo(target, 1)) {
                     if (target.store.getFreeCapacity(RESOURCE_ENERGY) > 200) {
-                        creep.transfer(target, Object.keys(creep.store)[0]);
+                        creep.transfer(target, Object.keys(creep.store)[0] as ResourceConstant);
                     } else {
                         delete creep.memory.cache.targetId;
                     }
@@ -172,7 +172,7 @@ const outCarry = {
             creep.memory.cache.targetId = target.id;
             if (creep.pos.inRangeTo(target, 1)) {
                 if (target.store.getFreeCapacity() > 0) {
-                    creep.transfer(target, Object.keys(creep.store)[0]);
+                    creep.transfer(target, Object.keys(creep.store)[0] as ResourceConstant);
                 } else {
                     delete creep.memory.cache.targetId;
                 }
@@ -184,13 +184,13 @@ const outCarry = {
             const controller = creep.room.controller;
             if (storage) {
                 if (creep.pos.inRangeTo(storage, 1)) {
-                    creep.drop(Object.keys(creep.store)[0]);
+                    creep.drop(Object.keys(creep.store)[0] as ResourceConstant);
                 } else {
                     creep.moveTo(storage, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10 });
                 }
             } else if (controller && controller.level < 8) {
                 if (creep.pos.inRangeTo(controller, 1)) {
-                    creep.drop(Object.keys(creep.store)[0]);
+                    creep.drop(Object.keys(creep.store)[0] as ResourceConstant);
                 } else {
                     creep.moveTo(controller, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10 });
                 }
@@ -199,9 +199,9 @@ const outCarry = {
                 const center = Memory['RoomControlData'][creep.room.name]?.center;
                 const centerPos = new RoomPosition(center.x, center.y, creep.room.name);
                 if (centerPos && creep.pos.inRangeTo(centerPos, 1)) {
-                    creep.drop(Object.keys(creep.store)[0]);
+                    creep.drop(Object.keys(creep.store)[0] as ResourceConstant);
                 } else {
-                    creep.moveTo(centerPos, { maxRooms: 1, range: 1, plainCost: 2, swampCost: 10 });
+                    creep.moveTo(centerPos, {range: 1, plainCost: 2, swampCost: 10 });
                 }
             }
         }
@@ -221,7 +221,7 @@ const outCarry = {
                 return true;
             }
             if (road.hits > road.hitsMax / 10 * 8 && target && !creep.pos.inRangeTo(target, 1)) {
-                creep.moveTo(target);
+                creep.moveTo(target, { range: 1, plainCost: 2, swampCost: 10 });
                 return true;
             }
         }

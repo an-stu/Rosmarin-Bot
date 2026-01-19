@@ -191,6 +191,7 @@ interface RoomControlMemory {
  * @description 单个房间的建筑运行参数
  */
 interface StructControlMemory {
+    labNum: number;
     // --------------------------------------------------------
     // PowerSpawn 配置
     // --------------------------------------------------------

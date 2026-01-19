@@ -14,7 +14,7 @@ export default class AutoLab extends Room {
 
         const labA = Game.getObjectById(botmem.labA) as StructureLab;
         const labB = Game.getObjectById(botmem.labB) as StructureLab;
-        if (!labA || !labB) return;
+        if (!labA || !labB || (botmem.labNum && this.lab.length > botmem.labNum + 3)) setLab(this);
         // 检查库存是否够合成
         const ResAmountCheck = (this.getResAmount(botmem.labAtype) >= 1000 &&
                                 this.getResAmount(botmem.labBtype) >= 1000)
@@ -145,4 +145,48 @@ const getT3Task = (room: Room) => {
     if (check('UH2O', 'XUH2O')) return [ 'XUH2O', r('XUH2O') + 10e3 ];
     if (check('KHO2', 'XKHO2')) return [ 'XKHO2', r('XKHO2') + 10e3 ];
     return [ null, 0 ];
+}
+
+const setLab = (room: Room) => {
+    // 设置对应labA和labB 一个房间最多10个lab 如果小于7级则不设置
+    if (room.controller.level < 7) return;
+    const labs = room.lab;
+    if (!labs || labs.length < 7) return;
+    // 设置考虑距离，有两个lab处在中心，即相对所有lab距离都在2格以内 并且labA与labB相距最小
+    let centerLabs: StructureLab[] = [];
+    for (let i = 0; i < labs.length; i++) {
+        const lab1 = labs[i];
+        let count = 0;
+        for (let j = 0; j < labs.length; j++) {
+            if (i === j) continue;
+            const lab2 = labs[j];
+            if (lab1.pos.inRangeTo(lab2.pos, 2)) {
+                count++;
+            }
+        }
+        if (count >= labs.length - 3) {
+            centerLabs.push(lab1);
+        }
+    }
+    if (centerLabs.length < 2) return;
+    // 选择两个距离最小的作为labA和labB
+    let minDist = Infinity;
+    let labA: StructureLab = centerLabs[0];
+    let labB: StructureLab = centerLabs[1];
+    for (let i = 0; i < centerLabs.length; i++) {
+        for (let j = i + 1; j < centerLabs.length; j++) {
+            const dist = centerLabs[i].pos.getRangeTo(centerLabs[j].pos);
+            if (dist < minDist) {
+                minDist = dist;
+                labA = centerLabs[i];
+                labB = centerLabs[j];
+            }
+        }
+    }
+    const botmem =  Memory['StructControlData'][room.name];
+    console.log(`[自动Lab合成] ${room.name}设置labA: ${labA.id}, labB: ${labB.id}`);
+    botmem.labA = labA.id;
+    botmem.labB = labB.id;
+    // lab数量更新后同步labNum
+    botmem.labNum = labs.length;
 }
