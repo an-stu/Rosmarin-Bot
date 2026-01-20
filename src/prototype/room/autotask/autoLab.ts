@@ -36,6 +36,9 @@ export default class AutoLab extends Room {
             botmem.labBtype = null;
             botmem.labAmount = 0;
             global.log(`[自动Lab合成] ${this.name}已自动关闭lab合成任务: ${labProduct}`)
+            const autoLabMap = Memory['AutoData']['AutoLabData'][this.name];
+            // 删除任务
+            if (autoLabMap && autoLabMap[labProduct]) delete autoLabMap[labProduct];
         }
 
         // 获取新任务
@@ -85,37 +88,37 @@ export const getCustomizeTask = (room: Room): [string | null, number] => {
     // 递归检查化合物合成可行性并返回最需要优先合成的任务
     const checkCompoundFeasibility = (compound: string, targetAmount: number): [string | null, number] => {
         const currentAmount = room.getResAmount(compound);
-        
+
         // 如果已经达到目标数量的90%，不需要合成
         if (currentAmount >= targetAmount * 0.99) {
             return [null, 0];
         }
-        
+
         // 如果不是可合成的化合物（在LabMap中），返回null
         if (!LabMap[compound]) {
             return [null, 0];
         }
-        
+
         const recipe = LabMap[compound];
         const raw1 = recipe.raw1;
         const raw2 = recipe.raw2;
-        
+
         // 计算需要合成的数量，单次最多合成6000
         const needToProduce = Math.min(targetAmount - currentAmount, 6000);
-        
+
         if (needToProduce <= 0) {
             return [null, 0];
         }
-        
+
         // 检查原料1是否足够
         const raw1Current = room.getResAmount(raw1);
         const raw1Needed = needToProduce;
-        
+
         // 如果原料1是基础资源且不足6000，跳过此任务
         if (LabRes.includes(raw1) && raw1Current < Math.min(6000, raw1Needed)) {
             return [null, 0];
         }
-        
+
         if (raw1Current < raw1Needed) {
             if (LabMap[raw1]) {
                 // 递归检查原料1的合成可行性
@@ -131,16 +134,16 @@ export const getCustomizeTask = (room: Room): [string | null, number] => {
                 return [null, 0];
             }
         }
-        
+
         // 检查原料2是否足够
         const raw2Current = room.getResAmount(raw2);
         const raw2Needed = needToProduce;
-        
+
         // 如果原料2是基础资源且不足6000，跳过此任务
         if (LabRes.includes(raw2) && raw2Current < Math.min(6000, raw2Needed)) {
             return [null, 0];
         }
-        
+
         if (raw2Current < raw2Needed) {
             if (LabMap[raw2]) {
                 // 递归检查原料2的合成可行性
@@ -156,7 +159,7 @@ export const getCustomizeTask = (room: Room): [string | null, number] => {
                 return [null, 0];
             }
         }
-        
+
         // 两种原料都足够，返回当前化合物
         return [compound, needToProduce];
     };
@@ -165,7 +168,7 @@ export const getCustomizeTask = (room: Room): [string | null, number] => {
     const targetCompounds = Object.keys(autoLabMap)
         .filter(res => autoLabMap[res] > 0 && room.getResAmount(res) < autoLabMap[res] * 0.9)
         .sort((a, b) => (LabLevel[a] || 999) - (LabLevel[b] || 999));
-    
+
     // 依次检查每个目标化合物
     for (const compound of targetCompounds) {
         const targetAmount = autoLabMap[compound];
@@ -174,36 +177,36 @@ export const getCustomizeTask = (room: Room): [string | null, number] => {
             return [task, taskAmount];
         }
     }
-    
+
     return [null, 0];
 };
 
 // 设置lab任务的函数
 export const setLabTask = (room: Room, labA: StructureLab, labB: StructureLab): void => {
     const [task, taskAmount] = getCustomizeTask(room);
-    
+
     if (!task || taskAmount <= 0) {
         console.log(`[自动Lab合成] ${room.name} 没有需要合成的化合物`);
         return;
     }
-    
+
     const color = CompoundColor[task] || '#ffffff';
     const targetAmount = Memory['AutoData']['AutoLabData'][room.name][task] || 0;
     const currentAmount = room.getResAmount(task);
-    
+
     console.log(`[自动Lab合成] ${room.name} 设置合成任务: ${getColoredText(task, color)} (${currentAmount}/${targetAmount})，数量: ${taskAmount}`);
-    
+
     const recipe = LabMap[task];
     if (!recipe) {
         console.log(`[错误] ${task} 没有配方定义`);
         return;
     }
-    
+
     const raw1 = recipe.raw1;
     const raw2 = recipe.raw2;
     const raw1Color = CompoundColor[raw1] || '#ffffff';
     const raw2Color = CompoundColor[raw2] || '#ffffff';
-    
+
     // 检查原料是否足够
     if (room.getResAmount(raw1) >= taskAmount && room.getResAmount(raw2) >= taskAmount) {
         console.log(`[自动Lab合成] ${room.name} 设置labA: ${labA.id}, labB: ${labB.id} 合成 ${getColoredText(task, color)} (${taskAmount})`);
@@ -222,28 +225,28 @@ export const showRoomLabTasks = (room: Room): void => {
         console.log(`${room.name} 没有配置自动合成任务`);
         return;
     }
-    
+
     console.log(`${room.name} 自动合成目标:`);
     console.log('化合物 | 当前数量 | 目标数量 | 进度');
     console.log('-----------------------------------');
-    
+
     const sortedCompounds = Object.keys(autoLabMap)
         .filter(res => autoLabMap[res] > 0)
         .sort((a, b) => (LabLevel[a] || 999) - (LabLevel[b] || 999));
-    
+
     for (const compound of sortedCompounds) {
         const target = autoLabMap[compound];
         const current = room.getResAmount(compound);
         const progress = target > 0 ? Math.min((current / target) * 100, 100).toFixed(1) : '0.0';
         const color = CompoundColor[compound] || '#ffffff';
-        
+
         const barLength = 20;
         const filled = Math.floor((current / target) * barLength);
         const bar = '█'.repeat(filled) + '░'.repeat(barLength - filled);
-        
+
         console.log(`${getColoredText(compound, color).padEnd(10)} ${current.toString().padStart(8)} / ${target.toString().padStart(8)} ${progress.padStart(6)}% ${bar}`);
     }
-    
+
     const [task, taskAmount] = getCustomizeTask(room);
     if (task) {
         console.log(`\n建议的合成任务: ${getColoredText(task, CompoundColor[task] || '#ffffff')} (${taskAmount})`);
@@ -256,17 +259,17 @@ export const getSynthesisPathWithAmount = (room: Room, targetCompound: string): 
     if (!autoLabMap || !autoLabMap[targetCompound]) {
         return [];
     }
-    
+
     const targetAmount = autoLabMap[targetCompound];
     const currentAmount = room.getResAmount(targetCompound);
     const neededAmount = Math.max(0, targetAmount - currentAmount);
-    
+
     if (neededAmount <= 0) {
         return [];
     }
-    
+
     const path: any[] = [];
-    
+
     const calculatePath = (compound: string, amount: number, depth: number = 0): any => {
         const current = room.getResAmount(compound);
         const node = {
@@ -277,13 +280,13 @@ export const getSynthesisPathWithAmount = (room: Room, targetCompound: string): 
             depth,
             children: []
         };
-        
+
         if (LabMap[compound] && amount > 0) {
             const recipe = LabMap[compound];
             const raw1 = recipe.raw1;
             const raw2 = recipe.raw2;
             const rawNeeded = amount;
-            
+
             // 检查原料1
             if (LabMap[raw1] || LabRes.includes(raw1)) {
                 const raw1Current = room.getResAmount(raw1);
@@ -292,7 +295,7 @@ export const getSynthesisPathWithAmount = (room: Room, targetCompound: string): 
                     node.children.push(calculatePath(raw1, raw1Needed, depth + 1));
                 }
             }
-            
+
             // 检查原料2
             if (LabMap[raw2] || LabRes.includes(raw2)) {
                 const raw2Current = room.getResAmount(raw2);
@@ -302,10 +305,10 @@ export const getSynthesisPathWithAmount = (room: Room, targetCompound: string): 
                 }
             }
         }
-        
+
         return node;
     };
-    
+
     path.push(calculatePath(targetCompound, neededAmount));
     return path;
 };
@@ -313,19 +316,19 @@ export const getSynthesisPathWithAmount = (room: Room, targetCompound: string): 
 // 显示合成路径树
 export const showSynthesisPathTree = (room: Room, targetCompound: string): void => {
     const pathTree = getSynthesisPathWithAmount(room, targetCompound);
-    
+
     if (pathTree.length === 0) {
         console.log(`${room.name} 没有需要合成的 ${targetCompound}`);
         return;
     }
-    
+
     const printNode = (node: any, prefix: string = ''): void => {
         const color = node.color;
         const compoundText = getColoredText(node.compound, color);
         const info = `(当前: ${node.current}, 需要: ${node.needed})`;
-        
+
         console.log(`${prefix}${compoundText} ${info}`);
-        
+
         // 修复：使用常规for循环来避免类型错误
         for (let i = 0; i < node.children.length; i++) {
             const child = node.children[i];
@@ -334,9 +337,9 @@ export const showSynthesisPathTree = (room: Room, targetCompound: string): void 
             printNode(child, childPrefix);
         }
     };
-    
+
     console.log(`${room.name} 合成 ${getColoredText(targetCompound, CompoundColor[targetCompound] || '#ffffff')} 的路径树:`);
-    
+
     // 修复：使用for循环遍历根节点
     for (let i = 0; i < pathTree.length; i++) {
         printNode(pathTree[i]);
