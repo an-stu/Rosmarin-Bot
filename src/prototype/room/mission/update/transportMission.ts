@@ -282,6 +282,18 @@ function UpdateLabMission(room: Room) {
             amount: lab.store[lab.mineralType],
         }
         room.TransportMissionAdd(LevelMap.lab, taskdata)
+        // 取出对应产物后在Memory中减少生产数量
+            const autoLabMap = Memory['AutoData']['AutoLabData'][room.name];
+    if (!autoLabMap || !Object.keys(autoLabMap).length) return [null, 0];
+        const res = lab.mineralType as ResourceConstant;
+        if (res && autoLabMap[res] && autoLabMap[res] > 0) {
+            autoLabMap[res] = Math.max(0, autoLabMap[res] - lab.store[lab.mineralType]);
+            if (autoLabMap[res] === 0) {
+                delete autoLabMap[res];
+                console.log(`房间 ${room.name} 的lab任务 资源${res} 已完成，自动清除任务。`);
+            }
+        }
+
     });
 
     // 如果lab的资源不同于产物，则全部取出（不包括labA、labB，以及设定了boost的）

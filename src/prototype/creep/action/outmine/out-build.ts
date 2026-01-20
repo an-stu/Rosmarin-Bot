@@ -61,7 +61,7 @@ const outBuild = {
         }
     },
     build: function (creep) {
-        if (creep.room.name != creep.memory.targetRoom || creep.pos.isRoomEdge()) {
+        if (creep.room.name != creep.memory.targetRoom ) {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
         }
@@ -98,7 +98,7 @@ const outBuild = {
             return;
         }
     },
-    target: function (creep) {
+    target: function (creep:Creep) {
         this.build(creep);
         if (creep.store.getUsedCapacity() == 0) {
             creep.say('🔄');
