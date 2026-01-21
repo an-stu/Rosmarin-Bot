@@ -3,7 +3,7 @@ import { compress } from '@/utils';
 // 更新运输任务
 function UpdateTransportMission(room: Room) {
     const storage = room.storage;
-    if (!storage) return;
+    if  (!storage) return;
 
     UpdateEnergyMission(room);
     UpdatePowerMission(room);
@@ -283,8 +283,8 @@ function UpdateLabMission(room: Room) {
         }
         room.TransportMissionAdd(LevelMap.lab, taskdata)
         // 取出对应产物后在Memory中减少生产数量
-        const autoLabMap = Memory['AutoData']['AutoLabData'][room.name];
-        if (!autoLabMap || !Object.keys(autoLabMap).length) return [null, 0];
+            const autoLabMap = Memory['AutoData']['AutoLabData'][room.name];
+    if (!autoLabMap || !Object.keys(autoLabMap).length) return [null, 0];
         const res = lab.mineralType as ResourceConstant;
         if (res && autoLabMap[res] && autoLabMap[res] > 0) {
             autoLabMap[res] = Math.max(0, autoLabMap[res] - lab.store[lab.mineralType]);

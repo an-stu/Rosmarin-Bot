@@ -2,14 +2,14 @@ export default class DoubleAction extends Creep {
     // 双人小队移动
     doubleMove(Direction: DirectionConstant): number {
         const bindCreep = Game.getObjectById(this.memory.bind) as Creep;
-        if(!bindCreep) return;
+        if (!bindCreep) return;
 
         if (this.pos.isNear(bindCreep.pos)) {
             // 疲劳时不移动
-            if(this.fatigue > 0) return;
+            if (this.fatigue > 0) return;
             // 同时移动
             const result = this.move(Direction);
-            if(result === OK) {
+            if (result === OK) {
                 // 如果移动成功，那么绑定creep跟随
                 this.pull(bindCreep);
                 bindCreep.move(this);
@@ -17,26 +17,26 @@ export default class DoubleAction extends Creep {
             return result;
         } else {    // 如果距离拉远了，那么等他过来
             // 位于房间边缘时不等
-            if(this.pos.isRoomEdge()) this.move(Direction);
+            if (this.pos.isRoomEdge()) this.move(Direction);
             bindCreep.moveTo(this);
             return OK;
         }
     }
 
     // 双人小队移动到目标
-    doubleMoveTo(target: RoomPosition, color='#ffffff', ops={}): number | boolean {
+    doubleMoveTo(target: RoomPosition, color = '#ffffff', ops = {}): number | boolean {
         const bindCreep = Game.getObjectById(this.memory.bind) as Creep;
-        if(!bindCreep) return;
+        if (!bindCreep) return;
 
         ops['visualizePathStyle'] = { stroke: color };
         if (!ops['ignoreCreeps']) ops['ignoreCreeps'] = false;
 
         if (this.pos.isNear(bindCreep.pos)) {
             // 疲劳时不移动
-            if(this.fatigue > 0) return;
+            if (this.fatigue > 0) return;
             // 同时移动
             const result = this.moveTo(target, ops);
-            if(result === OK) {
+            if (result === OK) {
                 // 如果移动成功，那么绑定creep跟随
                 this.pull(bindCreep);
                 bindCreep.move(this);
@@ -46,18 +46,18 @@ export default class DoubleAction extends Creep {
         // 如果距离拉远了，那么等他过来
         else {
             // 位于房间边缘时不等
-            if(this.pos.isRoomEdge()) this.moveTo(target, ops);
+            if (this.pos.isRoomEdge()) this.moveTo(target, ops);
             bindCreep.moveTo(this);
             return OK;
         }
     }
-    
+
     // 双人小队移动到目标房间
     doubleMoveToRoom(roomName: string, color: string): boolean {
         const bindcreep = Game.getObjectById(this.memory.bind) as Creep;
-        if(!bindcreep) return;
+        if (!bindcreep) return;
         // 移动到目标房间
-        if(this.room.name !== roomName) {
+        if (this.room.name !== roomName) {
             this.doubleMoveTo(new RoomPosition(25, 25, roomName), color);
             return true;
         }
@@ -69,7 +69,7 @@ export default class DoubleAction extends Creep {
     // 躲边界
     doubleFleeEdge() {
         const bindcreep = Game.getObjectById(this.memory.bind) as Creep;
-        if(!bindcreep) return;
+        if (!bindcreep) return;
 
         if (this.pos.isRoomEdge()) {
             this.moveToRoom(this.room.name);
@@ -103,7 +103,7 @@ export default class DoubleAction extends Creep {
         const bindcreep = Game.getObjectById(this.memory.bind) as Creep;
         let goals = this.pos.findInRange(FIND_HOSTILE_CREEPS, 10, {
             filter: (c) => !c.isWhiteList() &&
-            (c.getActiveBodyparts(ATTACK) || c.getActiveBodyparts(RANGED_ATTACK))
+                (c.getActiveBodyparts(ATTACK) || c.getActiveBodyparts(RANGED_ATTACK))
         }).map(c => {
             return {
                 pos: c.pos,
@@ -114,7 +114,7 @@ export default class DoubleAction extends Creep {
         let path = PathFinder.search(
             creep.pos,
             goals,
-            { 
+            {
                 flee: true,
                 plainCost: 1,
                 swampCost: 5,

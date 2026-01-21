@@ -1,5 +1,8 @@
+import layout from "@/console/function/layout";
+import room from "@/console/function/room";
+
 const claimer = {
-    run: function(creep: Creep) {
+    run: function (creep: Creep) {
         // 如果没有目标房间
         if (!creep.memory.targetRoom) {
             creep.say("🚨 无目标");
@@ -14,11 +17,11 @@ const claimer = {
         // 根据旗帜移动
         const name = creep.name.match(/_(\w+)/)?.[1];
         const moveflag = Game.flags[name + '-move'];
-        if(moveflag) {
-            if(creep.room.name !== moveflag.pos.roomName) {
+        if (moveflag) {
+            if (creep.room.name !== moveflag.pos.roomName) {
                 creep.memory.targetRoom = moveflag.pos.roomName;
             }
-            creep.moveTo(moveflag.pos, {visualizePathStyle: {stroke: '#00ff00'}})
+            creep.moveTo(moveflag.pos, { visualizePathStyle: { stroke: '#00ff00' } })
             return;
         }
 
@@ -27,7 +30,7 @@ const claimer = {
             creep.moveToRoom(creep.memory.targetRoom);
             return;
         }
-    
+
         const controller = creep.room.controller;
 
         if (!controller) return;
@@ -51,8 +54,13 @@ const claimer = {
 
         if (creep.pos.isNearTo(controller)) {
             const result = creep.claimController(controller);
-            if(creep.memory['sign']) creep.signController(controller, creep.memory['sign']);
-            if(result !== OK) { creep.reserveController(controller); }
+            if (creep.memory['sign']) creep.signController(controller, creep.memory['sign']);
+            if (result !== OK) { creep.reserveController(controller); }
+            if (result == OK) {
+                room.room.add(creep.memory.targetRoom);
+                layout.layout.build(creep.room.name);
+                layout.layout.auto(creep.room.name);
+            }
         }
         else {
             creep.moveTo(controller, {
@@ -61,7 +69,7 @@ const claimer = {
                 maxRooms: 1
             });
         }
-        
+
         return false;
     }
 };

@@ -28,7 +28,7 @@ export default class BaseFunction extends RoomPosition {
     // 是否位于房间边界
     isRoomEdge(): boolean {
         const { x, y } = this;
-        return x === 1 || x === 49 || y === 1 || y === 49;
+        return x === 0 || x === 49 || y === 0 || y === 49;
     }
 
     // 该位置是否可通行, 无视野根据terrain判定
