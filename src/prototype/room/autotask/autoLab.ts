@@ -30,8 +30,8 @@ export default class AutoLab extends Room {
             (ResAmountCheck || LabMineralCheck)
         ) return;
 
-        // 关闭任务
-        if (labProduct) {
+        // 关闭任务 如果当前任务存在且已达限额
+        if (labProduct && amount > 0 && this.getResAmount(labProduct) >= amount) {
             botmem.labAtype = null;
             botmem.labBtype = null;
             botmem.labAmount = 0;

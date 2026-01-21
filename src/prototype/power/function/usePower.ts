@@ -74,7 +74,7 @@ export default class PowerCreepUsePower extends PowerCreep {
         const storage = this.room.storage;
         if (!storage) return false;
         if (this.store[RESOURCE_OPS] < 100) return false;
-        if (storage.store.getFreeCapacity() > 5000) return false;
+        if (storage.store.getFreeCapacity() > 40000) return false;
         if (storage.effects && storage.effects.some(e =>
             e.effect == PWR_OPERATE_STORAGE && e.ticksRemaining > 0)
         ) return false;

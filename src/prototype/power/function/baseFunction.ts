@@ -17,8 +17,12 @@ export default class BaseFunction extends PowerCreep {
             const halfOps = Math.floor(this.store[RESOURCE_OPS] / 2);
             const amount = Math.min(halfOps, this.store[RESOURCE_OPS] - 200);
             if (amount <= 0) return false;
+            const storageCapacity = this.room.storage?.store.getFreeCapacity() || 0;
+            if (storageCapacity < amount) return false;
             if (this.pos.isNearTo(this.room.storage)) {
-                this.transfer(this.room.storage, RESOURCE_OPS, amount);
+                if (this.transfer(this.room.storage, RESOURCE_OPS, amount) == OK) {
+                    return true;
+                }
             } else {
                 this.moveTo(this.room.storage);
             }
